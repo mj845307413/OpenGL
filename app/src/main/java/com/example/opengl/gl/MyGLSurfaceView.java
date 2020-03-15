@@ -11,7 +11,7 @@ import android.view.MotionEvent;
  */
 public class MyGLSurfaceView extends GLSurfaceView {
 
-    private ShapeRenderer renderer;
+    private LsoscelesTriangleRender renderer;
 
     public MyGLSurfaceView(Context context) {
         this(context, null);
@@ -27,13 +27,13 @@ public class MyGLSurfaceView extends GLSurfaceView {
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2);
 
-        renderer = new ShapeRenderer();
+        renderer = new LsoscelesTriangleRender();
 
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(renderer);
 
         // Render the view only when there is a change in the drawing data
-        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+//        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 
     private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
@@ -65,7 +65,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                     dy = dy * -1 ;
                 }
 
-                renderer.setAngle(renderer.getAngle() + ((dx + dy) * TOUCH_SCALE_FACTOR));
+//                renderer.setAngle(renderer.getAngle() + ((dx + dy) * TOUCH_SCALE_FACTOR));
                 requestRender();
         }
 

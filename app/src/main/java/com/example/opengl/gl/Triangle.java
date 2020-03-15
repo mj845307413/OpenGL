@@ -23,6 +23,7 @@ public class Triangle {
 
     /**
      * 顶点着色程序-投影视图
+     * 这边相对于上面那个顶点着色器，增加了矩阵变换的影响。
      */
     private final String vertexShaderCode =
             // This matrix member variable provides a hook to manipulate

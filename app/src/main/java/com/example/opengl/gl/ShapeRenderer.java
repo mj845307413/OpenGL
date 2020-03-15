@@ -52,14 +52,21 @@ public class ShapeRenderer implements GLSurfaceView.Renderer {
 
     private void addRotate() {
         // Set the camera position (View matrix)
-        Matrix.setLookAtM(viewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+        //设置相机变换矩阵
+        Matrix.setLookAtM(viewMatrix,//相机变换矩阵
+                0,//变换矩阵的起始位置（偏移量）
+                0, 0, -3,//相机位置
+                0f, 0f, 0f,//观测点位置
+                0f, 1.0f, 0.0f);//相机的方向
 
         // Calculate the projection and view transformation
+        //矩阵相乘 vPMatrix是相乘的结果
         Matrix.multiplyMM(vPMatrix, 0, projectionMatrix, 0, viewMatrix, 0);
 
         // Create a rotation for the triangle
         // long time = SystemClock.uptimeMillis() % 4000L;
         // float angle = 0.090f * ((int) time);
+        //设置旋转变化矩阵
         Matrix.setRotateM(rotationMatrix, 0, mAngle, 0, 0, -1.0f);
 
         // Combine the rotation matrix with the projection and camera view
