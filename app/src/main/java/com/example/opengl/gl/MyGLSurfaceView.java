@@ -5,13 +5,15 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import com.example.opengl.render.IsoscelesTriangleRender;
+
 /**
  * @author majun
  * @date 2020-03-02
  */
 public class MyGLSurfaceView extends GLSurfaceView {
 
-    private LsoscelesTriangleRender renderer;
+    private IsoscelesTriangleRender renderer;
 
     public MyGLSurfaceView(Context context) {
         this(context, null);
@@ -27,7 +29,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2);
 
-        renderer = new LsoscelesTriangleRender();
+        renderer = new IsoscelesTriangleRender();
 
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(renderer);

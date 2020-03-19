@@ -1,10 +1,12 @@
-package com.example.opengl.gl;
+package com.example.opengl.render;
 
 import android.opengl.GLES20;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+
+import static com.example.opengl.utils.OpenGLUtils.loadShader;
 
 /**
  * @author majun
@@ -81,11 +83,9 @@ public class Triangle {
 
 
         //加载顶点着色程序
-        int vertexShader = ShapeRenderer.loadShader(GLES20.GL_VERTEX_SHADER,
-                vertexShaderCode);
+        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
         //加载片段着色程序
-        int fragmentShader = ShapeRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER,
-                fragmentShaderCode);
+        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
 
         // create empty OpenGL ES Program
         //程序 - 包含您希望用于绘制一个或多个形状的着色程序的 OpenGL ES 对象。
