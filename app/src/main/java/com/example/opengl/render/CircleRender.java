@@ -6,6 +6,7 @@ import android.opengl.GLSurfaceView;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -15,9 +16,12 @@ import static com.example.opengl.utils.OpenGLUtils.loadShader;
 
 /**
  * @author majun
- * @date 2020-03-18
+ * @date 2020-03-19
  */
-public class CommonTriangleRender implements GLSurfaceView.Renderer {
+public class CircleRender implements GLSurfaceView.Renderer {
+    private static final int NUM_SIDE = 4;
+    private static final float CIRCLE_RADIUS = 0.5f;
+
     /**
      * 顶点着色器
      * gl_Position是Shader的内置变量，为定点位置
@@ -33,43 +37,38 @@ public class CommonTriangleRender implements GLSurfaceView.Renderer {
      */
     private static final String fragmentShaderCode =
             " precision mediump float;" +
-            " uniform vec4 vColor;" +
-            " void main() {" +
-            "     gl_FragColor = vColor;" +
-            " }";
+                    " uniform vec4 vColor;" +
+                    " void main() {" +
+                    "     gl_FragColor = vColor;" +
+                    " }";
 
-    /**
-     * 三角形的形状
-     */
-    float triangleCoords[] = {
-            0.5f, 0.5f, 0.0f, // top
-            -0.5f, -0.5f, 0.0f, // bottom left
-            0.5f, -0.5f, 0.0f  // bottom right
-    };
 
-    /**
-     * 三角形的颜色
-     */
     float color[] = {1.0f, 1.0f, 1.0f, 1.0f}; //白色
     private FloatBuffer vertexBuffer;
     private int mProgram;
     private int mPositionHandle;
     private int mColorHandle;
-    private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
-    private final int vertexCount = triangleCoords.length / COORDS_PER_VERTEX;
+    private final int vertexStride = COORDS_PER_VERTEX * 4; // 每个点的字节大小
+
+    private int vertexCount;
+    private float[] shapeData;
+
+    public CircleRender() {
+        shapeData = createPositions();
+        vertexCount = shapeData.length / COORDS_PER_VERTEX;
+    }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         //将背景设置为灰色，
-        GLES20.glClearColor(0.5f,0.5f,0.5f,1.0f);
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         //申请底层空间
         ByteBuffer bb = ByteBuffer.allocateDirect(
-                triangleCoords.length * 4);
+                shapeData.length * 4);
         bb.order(ByteOrder.nativeOrder());
         //将坐标数据转换为FloatBuffer，用以传入给OpenGL ES程序
         vertexBuffer = bb.asFloatBuffer();
-        vertexBuffer.put(triangleCoords);
+        vertexBuffer.put(shapeData);
         vertexBuffer.position(0);
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER,
                 vertexShaderCode);
@@ -88,11 +87,12 @@ public class CommonTriangleRender implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        GLES20.glViewport(0,0,width,height);
+        GLES20.glViewport(0, 0, width, height);
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         //将程序加入到OpenGLES2.0环境
         GLES20.glUseProgram(mProgram);
         //获取顶点着色器的vPosition成员句柄
@@ -107,11 +107,27 @@ public class CommonTriangleRender implements GLSurfaceView.Renderer {
         mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
         //设置绘制三角形的颜色
         GLES20.glUniform4fv(mColorHandle, 1, color, 0);
-        //绘制三角形
-        //第一个参数表示绘制方式，第二个参数表示偏移量，第三个参数表示顶点个数。
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount);
+        //绘制多边形
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, vertexCount);
         //禁止顶点数组的句柄
         GLES20.glDisableVertexAttribArray(mPositionHandle);
+    }
 
+    private float[] createPositions() {
+        ArrayList<Float> data = new ArrayList<>();
+        data.add(0.0f);             //设置圆心坐标
+        data.add(0.0f);
+        data.add(0.0f);
+        float angDegSpan = 360f / CircleRender.NUM_SIDE;
+        for (float i = 0; i < 360 + angDegSpan; i += angDegSpan) {
+            data.add((float) (CircleRender.CIRCLE_RADIUS * Math.sin(i * Math.PI / 180f)));
+            data.add((float) (CircleRender.CIRCLE_RADIUS * Math.cos(i * Math.PI / 180f)));
+            data.add(0.0f);
+        }
+        float[] f = new float[data.size()];
+        for (int i = 0; i < f.length; i++) {
+            f[i] = data.get(i);
+        }
+        return f;
     }
 }

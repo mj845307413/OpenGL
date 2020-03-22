@@ -14,14 +14,11 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class ShapeRenderer implements GLSurfaceView.Renderer {
     private Triangle mTriangle;
-    private Square mSquare;
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 // initialize a triangle
         mTriangle = new Triangle();
-        // initialize a square
-        mSquare = new Square();
     }
 
     // vPMatrix is an abbreviation for "Model View Projection Matrix"

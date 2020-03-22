@@ -5,6 +5,8 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import com.example.opengl.render.BallRender;
+import com.example.opengl.render.CubeRender;
 import com.example.opengl.render.IsoscelesTriangleRender;
 
 /**
@@ -13,7 +15,7 @@ import com.example.opengl.render.IsoscelesTriangleRender;
  */
 public class MyGLSurfaceView extends GLSurfaceView {
 
-    private IsoscelesTriangleRender renderer;
+    private BallRender renderer;
 
     public MyGLSurfaceView(Context context) {
         this(context, null);
@@ -29,7 +31,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2);
 
-        renderer = new IsoscelesTriangleRender();
+        renderer = new BallRender();
 
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(renderer);
@@ -59,12 +61,12 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
                 // reverse direction of rotation above the mid-line
                 if (y > getHeight() / 2) {
-                    dx = dx * -1 ;
+                    dx = dx * -1;
                 }
 
                 // reverse direction of rotation to left of the mid-line
                 if (x < getWidth() / 2) {
-                    dy = dy * -1 ;
+                    dy = dy * -1;
                 }
 
 //                renderer.setAngle(renderer.getAngle() + ((dx + dy) * TOUCH_SCALE_FACTOR));
