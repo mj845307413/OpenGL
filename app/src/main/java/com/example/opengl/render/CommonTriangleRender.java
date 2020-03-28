@@ -32,11 +32,12 @@ public class CommonTriangleRender implements GLSurfaceView.Renderer {
      * gl_FragColor都是Shader的内置变量，为片元颜色。
      */
     private static final String fragmentShaderCode =
+            //设置精度
             " precision mediump float;" +
-            " uniform vec4 vColor;" +
-            " void main() {" +
-            "     gl_FragColor = vColor;" +
-            " }";
+                    " uniform vec4 vColor;" +
+                    " void main() {" +
+                    "     gl_FragColor = vColor;" +
+                    " }";
 
     /**
      * 三角形的形状
@@ -61,7 +62,7 @@ public class CommonTriangleRender implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         //将背景设置为灰色，
-        GLES20.glClearColor(0.5f,0.5f,0.5f,1.0f);
+        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         //申请底层空间
         ByteBuffer bb = ByteBuffer.allocateDirect(
@@ -88,7 +89,7 @@ public class CommonTriangleRender implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        GLES20.glViewport(0,0,width,height);
+        GLES20.glViewport(0, 0, width, height);
     }
 
     @Override

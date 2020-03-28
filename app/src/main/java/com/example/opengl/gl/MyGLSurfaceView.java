@@ -5,9 +5,7 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import com.example.opengl.render.BallRender;
-import com.example.opengl.render.CubeRender;
-import com.example.opengl.render.IsoscelesTriangleRender;
+import com.example.opengl.render.BitmapRender;
 
 /**
  * @author majun
@@ -15,7 +13,7 @@ import com.example.opengl.render.IsoscelesTriangleRender;
  */
 public class MyGLSurfaceView extends GLSurfaceView {
 
-    private BallRender renderer;
+    private BitmapRender renderer;
 
     public MyGLSurfaceView(Context context) {
         this(context, null);
@@ -31,13 +29,13 @@ public class MyGLSurfaceView extends GLSurfaceView {
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2);
 
-        renderer = new BallRender();
+        renderer = new BitmapRender(getContext());
 
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(renderer);
-
+        //本来onDrawFrame会每一帧都调用，通过设置这个值，会在数据源变化的时候调用
         // Render the view only when there is a change in the drawing data
-//        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 
     private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
