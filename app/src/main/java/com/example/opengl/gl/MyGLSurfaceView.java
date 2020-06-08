@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.example.opengl.render.BitmapRender;
+import com.example.opengl.render.CubeRender;
 
 /**
  * @author majun
@@ -13,7 +14,7 @@ import com.example.opengl.render.BitmapRender;
  */
 public class MyGLSurfaceView extends GLSurfaceView {
 
-    private BitmapRender renderer;
+    private CubeRender renderer;
 
     public MyGLSurfaceView(Context context) {
         this(context, null);
@@ -29,7 +30,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2);
 
-        renderer = new BitmapRender(getContext());
+        renderer = new CubeRender();
 
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(renderer);

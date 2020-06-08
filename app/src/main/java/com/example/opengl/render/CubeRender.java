@@ -4,6 +4,8 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
+import com.example.opengl.utils.MatrixTools;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -79,15 +81,17 @@ public class CubeRender implements GLSurfaceView.Renderer {
 
 
     private int mProgram;
-    private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
     private FloatBuffer vertexBuffer;
     private FloatBuffer colorBuffer;
     private ShortBuffer indexBuffer;
-    private float[] mProjectMatrix = new float[16];
-    private float[] mViewMatrix = new float[16];
-    private float[] mMVPMatrix = new float[16];
+    private float[] matrix = new float[16];
+    private int hMatrix;
+    private int hVertex;
+    private int hColor;
+    private MatrixTools tools;
 
     public CubeRender() {
+        tools = new MatrixTools();
     }
 
     @Override
@@ -133,18 +137,18 @@ public class CubeRender implements GLSurfaceView.Renderer {
         GLES20.glAttachShader(mProgram, fragmentShader);
         //连接到着色器程序
         GLES20.glLinkProgram(mProgram);
+
+        hVertex = GLES20.glGetAttribLocation(mProgram, "vPosition");
+        hColor = GLES20.glGetAttribLocation(mProgram, "aColor");
+        hMatrix = GLES20.glGetUniformLocation(mProgram, "vMatrix");
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-//计算宽高比
-        float ratio = (float) width / height;
-        //设置透视投影
-        Matrix.frustumM(mProjectMatrix, 0, -ratio, ratio, -1, 1, 3, 20);
-        //设置相机位置
-        Matrix.setLookAtM(mViewMatrix, 0, 5.0f, 10.0f, 5.0f, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
-        //计算变换矩阵
-        Matrix.multiplyMM(mMVPMatrix, 0, mProjectMatrix, 0, mViewMatrix, 0);
+        GLES20.glViewport(0,0,width,height);
+        float rate=width/(float)height;
+        tools.ortho(-rate*6,rate*6,-6,6,3,20);
+        tools.setCamera(10,10,10,0,0,0,0,1,0);
     }
 
     @Override
@@ -154,32 +158,68 @@ public class CubeRender implements GLSurfaceView.Renderer {
         //将程序加入到OpenGLES2.0环境
         GLES20.glUseProgram(mProgram);
 
-        //指定vMatrix的值,glGetUniformLocation这个是获取uniform的
-        int mMatrixHandler = GLES20.glGetUniformLocation(mProgram, "vMatrix");
-        GLES20.glUniformMatrix4fv(mMatrixHandler, 1, false, mMVPMatrix, 0);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+        matrix = tools.getFinalMatrix();
+        drawSelf();
 
+//y轴正方形平移
+        tools.pushMatrix();
+        tools.translate(0, 3, 0);
+        matrix = tools.getFinalMatrix();
+        drawSelf();
+        tools.popMatrix();
 
-        //获取顶点着色器的vPosition成员句柄
-        int mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
-        //启用三角形顶点的句柄
-        GLES20.glEnableVertexAttribArray(mPositionHandle);
+//y轴负方向平移，然后按xyz->(0,0,0)到(1,1,1)旋转30度
+        tools.pushMatrix();
+        tools.translate(0, -3, 0);
+        tools.rotate(30f, 1, 1, 1);
+        matrix = tools.getFinalMatrix();
+        drawSelf();
+        tools.popMatrix();
+
+//x轴负方向平移，然后按xyz->(0,0,0)到(1,-1,1)旋转120度，在放大到0.5倍
+        tools.pushMatrix();
+        tools.translate(-3, 0, 0);
+        tools.scale(0.5f, 0.5f, 0.5f);
+
+//在以上变换的基础上再进行变换
+        tools.pushMatrix();
+        tools.translate(12, 0, 0);
+        tools.scale(1.0f, 2.0f, 1.0f);
+        tools.rotate(30f, 1, 2, 1);
+        matrix = tools.getFinalMatrix();
+        drawSelf();
+        tools.popMatrix();
+
+//接着被中断的地方执行
+        tools.rotate(30f, -1, -1, 1);
+        matrix = tools.getFinalMatrix();
+        drawSelf();
+        tools.popMatrix();
+    }
+
+    public void drawSelf() {
+
+        //指定vMatrix的值
+        if (matrix != null) {
+            GLES20.glUniformMatrix4fv(hMatrix, 1, false, matrix, 0);
+        }
+        //启用句柄
+        GLES20.glEnableVertexAttribArray(hVertex);
+        GLES20.glEnableVertexAttribArray(hColor);
         //准备三角形的坐标数据
-        GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX,
+        GLES20.glVertexAttribPointer(hVertex, 3,
                 GLES20.GL_FLOAT, false,
-                vertexStride, vertexBuffer);
-
-
-        //获取片元着色器的vColor成员的句柄
-        int mColorHandle = GLES20.glGetAttribLocation(mProgram, "aColor");
+                0, vertexBuffer);
         //设置绘制三角形的颜色
-        GLES20.glEnableVertexAttribArray(mColorHandle);
-        GLES20.glVertexAttribPointer(mColorHandle, 4,
-                GLES20.GL_FLOAT, false, 0, colorBuffer);
-
-
-        //索引法绘制正方体,根据索引来找到对应的点，根据绘制的方式进行绘制
+        GLES20.glVertexAttribPointer(hColor, 4,
+                GLES20.GL_FLOAT, false,
+                0, colorBuffer);
+        //索引法绘制正方体
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, index.length, GLES20.GL_UNSIGNED_SHORT, indexBuffer);
         //禁止顶点数组的句柄
-        GLES20.glDisableVertexAttribArray(mPositionHandle);
+        GLES20.glDisableVertexAttribArray(hVertex);
+        GLES20.glDisableVertexAttribArray(hColor);
     }
+
 }
